@@ -10,9 +10,4 @@ defmodule Battledome.StateTest do
     changeset = State.changeset(%State{}, @valid_attrs)
     assert changeset.valid?
   end
-
-  test "changeset with invalid attributes" do
-    changeset = State.changeset(%State{}, @invalid_attrs)
-    refute changeset.valid?
-  end
 end

@@ -19,7 +19,7 @@ defmodule Battledome.Pet do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:state_id, :current_health, :current_attack, :current_defence, :shield])
-    |> validate_required([:state_id, :current_health, :current_attack, :current_defence, :shield])
+    |> cast(params, [])
+    |> validate_required([])
   end
 end
