@@ -14,6 +14,6 @@ config :battledome, Battledome.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
-  database: "battledome_test",
+  database: "red_green_development",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox

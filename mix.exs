@@ -10,7 +10,8 @@ defmodule Battledome.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
-     deps: deps()]
+     deps: deps(),
+     test_coverage: [tool: Coverex.Task]]
   end
 
   # Configuration for the OTP application.
@@ -40,7 +41,8 @@ defmodule Battledome.Mixfile do
      {:cowboy, "~> 1.0"},
      {:cors_plug, "~> 0.1.3"},
      {:ja_serializer, "~>0.10.1"},
-    {:httpotion, "~> 3.0.0"}
+     {:httpotion, "~> 3.0.0"},
+     {:coverex, "~> 1.4.10", only: :test}
   ]
   end
 

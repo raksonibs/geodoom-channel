@@ -23,34 +23,34 @@ defmodule Battledome.RoomChannel do
   end
 
   def handle_in("new:message", payload, socket) do
-    id = ~r/\d+/
-      |> Regex.run(payload["body"]["name"])
-      |> Enum.at(0)
-      |> Integer.parse
+    try do
+      id = ~r/\d+/
+        |> Regex.run(payload["body"]["name"])
+        |> Enum.at(0)
+        |> Integer.parse
+
+      battle_id = elem(id, 0)
     
-    battle_id = elem(id, 0)
-    
-    state = ( Repo.get_by(State, battle_id: battle_id) ) |> Repo.preload(:pet_states)
-    battle = ( Repo.get_by(Battle, id: battle_id) ) |> Repo.preload(:pets)
-    user = Repo.get_by(User, email: payload["currentUser"]["email"])
+      state = ( Repo.get_by(State, battle_id: battle_id) ) |> Repo.preload(:pet_states)
+      battle = ( Repo.get_by(Battle, id: battle_id) ) |> Repo.preload(:pets)
+      user = Repo.get_by(User, email: payload["currentUser"]["email"])
 
-    # NTD: What is the best way to do validation for currentUser.turn and the stateTurn for action?
+      message = payload["action"]
+        |> execute_action(state, battle, user)
 
-    message = payload["action"]
-      |> execute_action(state, battle, user)
+      # want to remove this case
+      case message do 
+        {:winner, _} -> broadcast socket, "new:winner", payload
+        {:ok, _} -> broadcast socket, "new:refresh", payload
+        {:ok, %Pet{}} -> broadcast socket, "new:refresh", payload
+        {:ok, %State{}} -> broadcast socket, "new:refresh", payload
+        {:error, _} -> broadcast socket, "new:error", payload
+      end
 
-    # want to remove this case
-    case message do 
-      {:winner, _} -> broadcast socket, "new:winner", payload
-      {:ok, _} -> broadcast socket, "new:refresh", payload
-      {:ok, %Pet{}} -> broadcast socket, "new:refresh", payload
-      {:ok, %State{}} -> broadcast socket, "new:refresh", payload
-      {:error, _} -> broadcast socket, "new:error", payload
+      {:noreply, socket}
+    rescue e ->
+      broadcast socket, "new:error", payload
     end
-    # message should be refresh model, or update the actual health
-    # refresh easier
-
-    {:noreply, socket}
   end
 
   def execute_action(event, state, battle, user) do
